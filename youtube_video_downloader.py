@@ -15,7 +15,7 @@ class Downloader(object):
         """If you have moduler error or something about modules use this method."""
         pip_list = getoutput("pip list")
         if "pytube" not in pip_list.split():
-            getoutput("pip install pytube")
+            getoutput("pip install pytube==12.1.0")
         else:
             pass
     
@@ -32,12 +32,19 @@ obj = Downloader("https://youtu.be/m4gnMWua4xo").download_audio()
         """)
 
     def __init__(self, url):
-        from pytube import YouTube
+        from pytube import YouTube, Playlist
         pwd = getcwd()
         self.url = url
         self.pwd = pwd
-        yt = YouTube(self.url)
-        self.yt = yt
+
+        try:
+            yt = YouTube(self.url)
+            self.yt = yt
+        except:
+            pass
+
+        pl = Playlist(self.url)
+        self.pl = pl
 
     def download_video(self):
         try:
@@ -69,4 +76,13 @@ obj = Downloader("https://youtu.be/m4gnMWua4xo").download_audio()
                 return
             print(f"Downloaded in {self.pwd}")
 
-#Downloader("https://youtu.be/m4gnMWua4xo").download_audio()
+    def download_playlist(self):
+        print(f"Downloading.. {self.pl.title}")
+        video_num = 0
+        for video in self.pl.videos:
+            video_num += 1
+            video.streams.get_highest_resolution().download(output_path=f"{self.pl.title}", filename=f"{video_num}){video.title}.mp4")
+            
+
+
+Downloader("https://youtube.com/playlist?list=PLKKYLPm3FCARcMH5790kD0KqZF3QCrgZN").download_playlist()
