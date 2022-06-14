@@ -4,22 +4,26 @@ from os import getcwd, rename
 
 """
 TODO
-*Playlist system,
 *Channel and Searching system will be added
+
 *System will be optimized
 *Useless things will be deleted
 """
 
 class Downloader(object):
-    def get_module(self):
+    def get_module():
         """If you have moduler error or something about modules use this method."""
         pip_list = getoutput("pip list")
         if "pytube" not in pip_list.split():
+            print("Installing a module")
             getoutput("pip install pytube==12.1.0")
-        else:
+            print("Installed\n")
+        elif "pytube" in pip_list.split():
             pass
+        else:
+            print("Please install manually!")
     
-    get_module(self="__self__")
+    get_module()
 
     def __doc__(self):
         print("""
@@ -41,10 +45,8 @@ obj = Downloader("https://youtu.be/m4gnMWua4xo").download_audio()
             yt = YouTube(self.url)
             self.yt = yt
         except:
-            pass
-
-        pl = Playlist(self.url)
-        self.pl = pl
+            pl = Playlist(self.url)
+            self.pl = pl
 
     def download_video(self):
         try:
@@ -59,12 +61,7 @@ obj = Downloader("https://youtu.be/m4gnMWua4xo").download_audio()
     def download_audio(self):
         try:
             print("Downloading..")
-            self.yt.streams.get_audio_only().download()
-            try:
-                rename(f"{self.yt.title}.mp4", f"{self.yt.title}.mp3")
-            except FileExistsError:
-                print(f"Cannot create an existing file ('mp3' file could not be downloaded). The file named '{self.yt.title}.mp4' has been downloaded")
-                return
+            self.yt.streams.get_audio_only().download(filename=f"{self.yt.title}.mp3")
             print(f"Downloaded in {self.pwd}")
         except:
             print("Command line download method started..")
@@ -76,13 +73,21 @@ obj = Downloader("https://youtu.be/m4gnMWua4xo").download_audio()
                 return
             print(f"Downloaded in {self.pwd}")
 
-    def download_playlist(self):
-        print(f"Downloading.. {self.pl.title}")
+    def download_playlist(self, audio = False):
         video_num = 0
-        for video in self.pl.videos:
-            video_num += 1
-            video.streams.get_highest_resolution().download(output_path=f"{self.pl.title}", filename=f"{video_num}){video.title}.mp4")
-            
+        if audio == False:
+            print(f"Downloading.. {self.pl.title}")
+            for video in self.pl.videos:
+                video_num += 1
+                video.streams.get_highest_resolution().download(output_path=f"{self.pl.title}", filename=f"{video_num}){video.title.replace('/', '')}.mp4")
+                print(f"Downloaded '{video.title}.mp4'")
+            print(f"Downloaded all videos in {self.pwd} ==> {self.pl.title}")
+        elif audio == True:
+            print(f"Downloading.. {self.pl.title}")
+            for video in self.pl.videos:
+                video_num += 1
+                video.streams.get_audio_only().download(output_path=f"{self.pl.title} Audios", filename=f"{video_num}){video.title.replace('/', '')}.mp3")
+                print(f"Downloaded '{video.title}.mp3'")
+            print(f"Downloaded all videos in {self.pwd} ==> {self.pl.title}")
 
-
-#Downloader("https://youtube.com/playlist?list=PLKKYLPm3FCARcMH5790kD0KqZF3QCrgZN").download_playlist()
+Downloader("https://youtube.com/playlist?list=PLUNPjaQ-i_voID9V4u9L23XWiwpUPY0sG").download_playlist(audio=True)
